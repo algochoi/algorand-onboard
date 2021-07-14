@@ -1,4 +1,4 @@
-# Algorand Playground
+# Algorand Onboarding
 
 A collection of notes and potentially useful stuff as I onboard.
 
@@ -66,3 +66,10 @@ goal clerk compile  -d ~/node/testnetdata -D mybin.tealc
 
 ### Stateful Contracts
 [Tutorial here](https://developer.algorand.org/docs/features/asc1/stateful/hello_world)
+
+### PyTeal
+[Pyteal](https://github.com/algorand/pyteal) can generate TEAL code by using Python code. 
+
+Here is an example game that uses PyTeal to generate a smart contract to play Battleship: [AlgoShip](https://github.com/jasonpaulos/algoship)
+
+You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, etc.) using [Algoexplorer](https://testnet.algoexplorer.io/). Try searching up your sample transaction by sender address and more!
