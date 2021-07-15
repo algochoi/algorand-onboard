@@ -5,9 +5,10 @@ A collection of notes and potentially useful stuff as I onboard.
 ## Contents
   * [Basics](#basics)
     + [Installing a node](#installing-a-node)
-    + [Switching networks](#switiching-networks)
+    + [Switching networks](#switching-networks)
   * [TEAL Contracts](#teal-contracts)
     + [Stateful Contracts](#stateful-contracts)
+  * [Development](#development)
 
 
 
@@ -35,6 +36,9 @@ You can check the status of your node in testnet with:
 `./goal node catchup [1234#YOURCHECKPOINTHERE] -d ~/node/testnetdata`
 
 Latest Testnet checkpoint: https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/testnet/latest.catchpoint
+
+#### My node isn't catching up!
+Double check that your node is up to date. If there has been a protocol change, you will not be able to sync current blocks on an older node. 
 
 ### Making an account
 Start kmd on a private network or testnet node:
@@ -73,3 +77,12 @@ goal clerk compile  -d ~/node/testnetdata -D mybin.tealc
 Here is an example game that uses PyTeal to generate a smart contract to play Battleship: [AlgoShip](https://github.com/jasonpaulos/algoship)
 
 You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, etc.) using [Algoexplorer](https://testnet.algoexplorer.io/). Try searching up your sample transaction by sender address and more!
+
+## Development
+### [go-algorand](https://github.com/algorand/go-algorand)
+* When you are making changes, fork the repo and create a branch for the change in your local fork
+* Strictest tests (Travis CI takes a long time)
+* Only certain people in the org can merge changes
+* Make sure you run `make sanity` before a PR 
+* If your change warrants documentation changes, check if you need to run `make` to automatically generate any other docs
+
