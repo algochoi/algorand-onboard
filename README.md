@@ -81,8 +81,18 @@ You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, 
 ## Development
 ### [go-algorand](https://github.com/algorand/go-algorand)
 * When you are making changes, fork the repo and create a branch for the change in your local fork
-* Strictest tests (Travis CI takes a long time)
+* Strictest tests (Travis CI takes a long time) and require at least 1 code review
 * Only certain people in the org can merge changes
 * Make sure you run `make sanity` before a PR 
 * If your change warrants documentation changes, check if you need to run `make` to automatically generate any other docs
 
+#### Try a Pull Request
+1. Make sure you have a github account set up. Optionally, set up a git client on your machine as well (I use the CLI from my Mac terminal) and set up any credentials you might need.
+2. Fork the [go-algorand](https://github.com/algorand/go-algorand) repo using your github credential. Make a new branch (`git checkout -b name-of-your-branch`) and start developing on there.
+3. On your editor (I use VS Code or vim), make a small change like adding a unit test. Save and try commiting your changes.
+4. Make more changes if desired. Commit, and repeat. If new commits have popped up in the main repo, make sure you `git pull` the latest changes from the remote. 
+5. Run `make sanity` before you submit your PR, or else your code may not pass the Travis CI style checks (and waste 30min of your time). 
+6. When you are ready, push the changes (squashing is optional), and open up a Pull Request on the Github client. 
+7. It is generally prudent to double check the diffs and make sure you are okay with your own changes. Try to confirm that your code passes all the Travis CI checks.
+8. Request some reviewers for feedback.
+9. After feedback is addressed and the changes are approved, they can be merged by an authorized member. After it has been merged, feel free to delete the branch you were working on. 
