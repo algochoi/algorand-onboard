@@ -99,3 +99,6 @@ You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, 
 7. It is generally prudent to double check the diffs and make sure you are okay with your own changes. Try to confirm that your code passes all the Travis CI checks.
 8. Request some reviewers for feedback.
 9. After feedback is addressed and the changes are approved, they can be merged by an authorized member. After it has been merged, feel free to delete the branch you were working on. 
+
+#### Code reviews
+You should have at least one person review your code/pull request before it is merged to master. The [Google Engineering guide](https://google.github.io/eng-practices/) is a good reference on how to give and address code reviews.
