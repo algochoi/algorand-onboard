@@ -2,9 +2,9 @@
 
 ## Usage
 
-This script can be used to quickly test builds or TEAL apps on sandbox. First, make sure you are running sandbox, change the path to your sandbox in `sandbox-testing.py` and run the following:
+This script can be used to quickly test builds or TEAL apps on sandbox. First, make sure you are running sandbox, change the path to your sandbox in `sandbox-test.py` and run the following:
 
-```python3 sandbox-testing.py```
+```python3 sandbox-test.py```
 
 ### Changing configs
 
