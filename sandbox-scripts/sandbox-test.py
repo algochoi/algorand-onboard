@@ -65,8 +65,10 @@ def get_funded_account():
     return pk, addr
 
 
+# Creates a stateful app for testing
+# The TEAL code for the app can be changed in sample-teal/
 def create_test_app():
-    # declare application state storage (immutable)
+    # Declare application state storage (immutable)
     local_ints = 1
     local_bytes = 1
     global_ints = 1
