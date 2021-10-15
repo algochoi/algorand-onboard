@@ -4,7 +4,6 @@ DO NOT expose your secrets to the outside world.
 """
 
 import base64
-import os
 import subprocess
 import pty
 import time
