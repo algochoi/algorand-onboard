@@ -54,6 +54,8 @@ Next, create a wallet and an account:
 ### Funding accounts
 On the testnet, there is a bank that gives out free Algos: [Bank](https://bank.testnet.algorand.network/)
 
+## Sandbox
+[Sandbox](https://github.com/algorand/sandbox) can run a private dev network separate from `goal`. The main advantage of this is that you don't have to sync to an actual network (can take tens of minutes even with Fast Catchup) and you can confirm blocks instantaneously on dev mode (instead of waiting ~4.5s). You can checkout an example in this very repo by running the script in `sandbox-scripts/sandbox-test.py`.
 
 ## TEAL Contracts
 [Compiling contracts using goal clerk](https://medium.com/algorand/understanding-algorand-smart-contracts-b9fc743e7a0f)
@@ -117,4 +119,4 @@ In addition to the individual tests in each repo (we currently support Go, Java,
 
 Generally, each SDK has a Makefile that has tags, e.g. `@unit.transactions`, that allows tests to be toggled on/off for a particular SDK. For local testing, you can also run these tags individually, e.g. `behave --tags="@unit.transactions" test -f progress2` for the Python SDK. 
 
-The Cucumber tests can be seen in `features/unit` or `features/integration`.
+The Cucumber tests can be seen in `features/unit` or `features/integration` in the SDK testing repo.
