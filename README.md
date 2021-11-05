@@ -102,3 +102,19 @@ You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, 
 
 #### Code reviews
 You should have at least one person review your code/pull request before it is merged to master. The [Google Engineering guide](https://google.github.io/eng-practices/) is a good reference on how to give and address code reviews.
+
+## Testing
+Each repo has a set of unit tests and integration/end-to-end ("E2E") tests. But for your own sanity, you may wish to test your changes manually or live. 
+
+### go-algorand
+There are two ways you can manually test out a `go-algorand` build. 
+
+1. Run `make install` locally. Your executable should be at `$GOPATH/bin` (you can also run `go env` to check where your `GOPATH` is). You can run `goal` commands from there. 
+2. Use `sandbox` and make it point to a specific commit. Sandbox allows you to change the configs so that you can build an executable from a particular repo or branch. This also works for indexer changes. Feel free to refer to `sandbox-scripts/` in this repo for a script to help you get started. 
+
+### SDKs
+In addition to the individual tests in each repo (we currently support Go, Java, Python, and JavaScript/TypeScript), we have an [algorand-sdk-testing](https://github.com/algorand/algorand-sdk-testing) repo using Cucumber. This allows us to standardize the testing environment using Docker for all the SDKs and minimize copy-pasting the same tests again. 
+
+Generally, each SDK has a Makefile that has tags, e.g. `@unit.transactions`, that allows tests to be toggled on/off for a particular SDK. For local testing, you can also run these tags individually, e.g. `behave --tags="@unit.transactions" test -f progress2` for the Python SDK. 
+
+The Cucumber tests can be seen in `features/unit` or `features/integration`.
