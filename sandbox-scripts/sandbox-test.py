@@ -12,7 +12,7 @@ from algosdk.future import transaction
 from algosdk.v2client import algod, indexer
 
 # Add your custom path to sandbox here
-SANDBOX_PATH = "./sandbox"
+SANDBOX_PATH = "../../sandbox/sandbox"
 
 # Note: These are sandbox endpoints and tokens.
 def create_algod_client():

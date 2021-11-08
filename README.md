@@ -2,22 +2,27 @@
 
 A collection of notes and potentially useful stuff as I onboard.
 
-## Contents
+- [Algorand Onboarding](#algorand-onboarding)
+  * [Contents](#contents)
   * [Basics](#basics)
     + [Installing a node](#installing-a-node)
-    + [Switching networks](#switching-networks)
+    + [Switching Networks](#switching-networks)
+    + [Sandbox](#sandbox)
   * [TEAL Contracts](#teal-contracts)
+    + [Stateless Contracts](#stateless-contracts)
     + [Stateful Contracts](#stateful-contracts)
+    + [PyTeal](#pyteal)
   * [Development](#development)
-
-
+  * [Testing](#testing)
+    + [go-algorand](#go-algorand)
+    + [SDKs](#sdks)
 
 ## Basics
 ### Installing a node
 [Installing on a Mac](https://developer.algorand.org/docs/run-a-node/setup/install/#installing-on-a-mac)
 
 ### Switching Networks
-If you followed the instructions above, the Algorand node will probably run on the Mainnet. You probably want to use the Testnet though, as it won't cost actual Algos to operate on the Testnet, contrary to the Mainnet. Basically, start the chain with the Testnet genesis block and sync to network [Instructions here](https://developer.algorand.org/docs/run-a-node/operations/switch_networks/).
+If you followed the instructions above, the Algorand node will probably run on the MainNet. You probably want to use the TestNet though, as it won't cost actual Algos to operate on the TestNet, contrary to the MainNet. Basically, start the chain with the TestNet genesis block and sync to network [Instructions here](https://developer.algorand.org/docs/run-a-node/operations/switch_networks/).
 
 ```
 cd ~/node
@@ -35,7 +40,7 @@ You can check the status of your node in testnet with:
 
 `./goal node catchup [1234#YOURCHECKPOINTHERE] -d ~/node/testnetdata`
 
-Latest Testnet checkpoint: https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/testnet/latest.catchpoint
+Latest TestNet checkpoint: https://algorand-catchpoints.s3.us-east-2.amazonaws.com/channel/testnet/latest.catchpoint
 
 #### My node isn't catching up!
 Double check that your node is up to date. If there has been a protocol change, you will not be able to sync current blocks on an older node. 
@@ -52,10 +57,11 @@ Next, create a wallet and an account:
 `$ ./goal account new -d [data directory] -w [wallet name]`
 
 ### Funding accounts
-On the testnet, there is a bank that gives out free Algos: [Bank](https://bank.testnet.algorand.network/)
+On the TestNet, there is a bank that gives out free Algos: [Bank](https://bank.testnet.algorand.network/).
 
-## Sandbox
+### Sandbox
 [Sandbox](https://github.com/algorand/sandbox) can run a private dev network separate from `goal`. The main advantage of this is that you don't have to sync to an actual network (can take tens of minutes even with Fast Catchup) and you can confirm blocks instantaneously on dev mode (instead of waiting ~4.5s). You can checkout an example in this very repo by running the script in `sandbox-scripts/sandbox-test.py`.
+Sandbox commands are generally prefixed with `sandbox`, e.g. `sandbox goal account list`. 
 
 ## TEAL Contracts
 [Compiling contracts using goal clerk](https://medium.com/algorand/understanding-algorand-smart-contracts-b9fc743e7a0f)
@@ -70,18 +76,18 @@ goal clerk compile subby.teal -d ~/node/testnetdata -o mysubbybin.tealc
 goal clerk compile  -d ~/node/testnetdata -D mybin.tealc
 ```
 
+Funnily enough, you always need to have a node running in order to compile a TEAL program (as of writing this). There is an example of how to do this using the Python SDK in `py-scripts`. You can supply a sandbox endpoint or a publicly available one (e.g. from the Developer's Academy) for ease of use.
+
 ### Stateless Contracts
-[Docs here](https://developer.algorand.org/docs/features/asc1/stateless/). LogicSigs generally fall into this category. 
+[Docs here](https://developer.algorand.org/docs/features/asc1/stateless/). LogicSigs generally fall into this category. Stateless contracts do not read state from the blockchain, which means it is computationally cheaper to execute and has more op-code budget compared to stateful contracts.
 
 ### Stateful Contracts
 [Tutorial here](https://developer.algorand.org/docs/features/asc1/stateful/hello_world)
 
 ### PyTeal
-[Pyteal](https://github.com/algorand/pyteal) can generate TEAL code by using Python code. 
+[Pyteal](https://github.com/algorand/pyteal) can generate TEAL code by using Python code.  Here is an example game that uses PyTeal to generate a smart contract to play Battleship: [AlgoShip](https://github.com/jasonpaulos/algoship).
 
-Here is an example game that uses PyTeal to generate a smart contract to play Battleship: [AlgoShip](https://github.com/jasonpaulos/algoship)
-
-You can also examine transactions on the Algorand blockchain (Mainnet, Testnet, etc.) using [Algoexplorer](https://testnet.algoexplorer.io/). Try searching up your sample transaction by sender address and more!
+You can also examine transactions on the Algorand blockchain (MainNet, TestNet, etc.) using [Algoexplorer](https://testnet.algoexplorer.io/). Try searching up your sample transaction by sender address and more!
 
 ## Development
 ### [go-algorand](https://github.com/algorand/go-algorand)
