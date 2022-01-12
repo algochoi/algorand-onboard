@@ -16,6 +16,7 @@ A collection of notes and potentially useful stuff as I onboard.
   * [Testing](#testing)
     + [go-algorand](#go-algorand)
     + [SDKs](#sdks)
+  * [Indexer](#indexer)
 
 ## Basics
 ### Installing a node
@@ -126,3 +127,8 @@ In addition to the individual tests in each repo (we currently support Go, Java,
 Generally, each SDK has a Makefile that has tags, e.g. `@unit.transactions`, that allows tests to be toggled on/off for a particular SDK. For local testing, you can also run these tags individually, e.g. `behave --tags="@unit.transactions" test -f progress2` for the Python SDK. 
 
 The Cucumber tests can be seen in `features/unit` or `features/integration` in the SDK testing repo.
+
+## Indexer
+Algod only keeps meaningful information about raw blocks (e.g. you query a block round and you get a JSON of all the information in that block). Algorand develops and maintains the [indexer](https://github.com/algorand/indexer) as a means of having a convenient way of making more meaningful queries on the blockchain state by maintaining its own Postgres database. It relies on an Algorand archival node (contains all the blocks in history) to validate transactions and imports them directly into its database. 
+
+The indexer can be thought of as two components: a REST API handler and a backend that reads and writes from the database (ignoring some details like importing blocks and executing them in the ledger). You can probably use sandbox to test some commands directly, user curl or use the SDKs to interact with the APIs. There is a tutorial [here](https://developer.algorand.org/docs/get-details/indexer/).
