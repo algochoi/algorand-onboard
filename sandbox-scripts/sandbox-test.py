@@ -60,9 +60,24 @@ def export_sandbox_account():
 
 def get_funded_account():
     passphrase = export_sandbox_account()
-    pk = mnemonic.to_private_key(passphrase)
-    addr = account.address_from_private_key(pk)
-    return pk, addr
+    sk = mnemonic.to_private_key(passphrase)
+    addr = account.address_from_private_key(sk)
+    return sk, addr
+
+
+def get_transient_account(client):
+    funded_sk, funded_pk = get_funded_account()
+    sk, pk = account.generate_account()
+    txn = transaction.PaymentTxn(
+        funded_pk,
+        client.suggested_params(),
+        pk,
+        3000000,
+    )
+    stxn = txn.sign(funded_sk)
+    tx_id = client.send_transaction((stxn))
+    transaction.wait_for_confirmation(client, tx_id, 5)
+    return sk, pk
 
 
 # Creates a stateful app for testing
@@ -94,9 +109,12 @@ def create_test_app():
 
     # Prepare the transaction
     params = client.suggested_params()
-    private_key, sender = get_funded_account()
 
-    # Create unsigned transaction
+    # Note: Currently accounts have a 10 app limit, so create a transient
+    # account if you wish to run this script many times.
+    private_key, sender = get_funded_account()  # get_transient_account(client)
+
+    # Create an unsigned transaction
     txn = transaction.ApplicationCreateTxn(
         sender,
         params,
@@ -115,11 +133,13 @@ def create_test_app():
     client.send_transactions([signed_txn])
 
     # Display results (may take ~30 seconds)
-    # On a "real" network, we need to add artificial delays so the blocks can be finalized
-    # On a "dev" network, we do not need to sleep the program as much as blocks are (almost)
-    # instantly finalized
+    # On a "real" network, we need to add artificial delays so the blocks
+    # can be finalized.
+    # On a "dev" network, we do not need to sleep the program as much as blocks
+    # are (almost) instantly finalized.
     SLEEP_TIME = 10  # seconds
     print("Waiting for blocks...")
+
     # TODO: Add wait_for_transactions method here instead...
     time.sleep(SLEEP_TIME)
     transaction_response = client.pending_transaction_info(tx_id)
@@ -127,6 +147,9 @@ def create_test_app():
     app_id = transaction_response["application-index"]
     algod_response = client.application_info(app_id)
     print(algod_response)
+
+    # If you are on dev mode, then you may need to send another transaction for
+    # Indexer to sync properly.
     time.sleep(SLEEP_TIME * 2)
     indexer_response = ind_client.applications(app_id)
     print(indexer_response)
