@@ -1,0 +1,9 @@
+#pragma version 5
+int 3
+itob
+log
+byte base64 AAAAAAAAAAA=
+log
+int 6
+pop
+int 1
