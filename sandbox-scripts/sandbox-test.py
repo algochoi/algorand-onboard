@@ -112,7 +112,7 @@ def create_test_app():
 
     # Note: Currently accounts have a 10 app limit, so create a transient
     # account if you wish to run this script many times.
-    private_key, sender = get_funded_account()  # get_transient_account(client)
+    private_key, sender = get_funded_account() # get_transient_account(client)
 
     # Create an unsigned transaction
     txn = transaction.ApplicationCreateTxn(
@@ -132,17 +132,14 @@ def create_test_app():
     # Send transaction
     client.send_transactions([signed_txn])
 
-    # Display results (may take ~30 seconds)
+    # Display results (may take ~20 seconds)
     # On a "real" network, we need to add artificial delays so the blocks
     # can be finalized.
     # On a "dev" network, we do not need to sleep the program as much as blocks
     # are (almost) instantly finalized.
-    SLEEP_TIME = 10  # seconds
     print("Waiting for blocks...")
 
-    # TODO: Add wait_for_transactions method here instead...
-    time.sleep(SLEEP_TIME)
-    transaction_response = client.pending_transaction_info(tx_id)
+    transaction_response = transaction.wait_for_confirmation(client, tx_id, 5)
     print(transaction_response)
     app_id = transaction_response["application-index"]
     algod_response = client.application_info(app_id)
@@ -150,7 +147,7 @@ def create_test_app():
 
     # If you are on dev mode, then you may need to send another transaction for
     # Indexer to sync properly.
-    time.sleep(SLEEP_TIME * 2)
+    time.sleep(10)
     indexer_response = ind_client.applications(app_id)
     print(indexer_response)
 

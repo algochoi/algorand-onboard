@@ -1,0 +1,21 @@
+#pragma version 5
+txn ApplicationID
+bz handle_createapp
+
+int 3
+itob
+log
+itxn_begin
+    int pay
+    itxn_field TypeEnum
+    int 5000
+    itxn_field Amount
+    txn Sender
+    itxn_field Receiver
+itxn_submit
+
+handle_createapp:
+txn ApplicationID
+itob
+log
+int 1

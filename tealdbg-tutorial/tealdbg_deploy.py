@@ -1,9 +1,8 @@
 import base64
 import os
+import pty
 from random import randrange
 import subprocess
-import pty
-import time
 
 from algosdk import account, mnemonic, logic
 from algosdk.future import transaction
@@ -11,7 +10,6 @@ from algosdk.v2client import algod, indexer
 
 
 SANDBOX_PATH = ""  # Your sandbox path here
-SLEEP_TIME = 6  # seconds
 
 
 def create_algod_client():
@@ -64,32 +62,43 @@ def get_funded_account():
     return pk, addr
 
 
-# Create global account and clients
-client = create_algod_client()
-ind_client = create_indexer_client()
-private_key, sender = get_funded_account()
-params = client.suggested_params()
-
-
-def create_transient_account(sender, private_key):
+def create_transient_account(client, sender, private_key):
     sk, pk = account.generate_account()
     txn = transaction.PaymentTxn(
         sender,
-        params,
+        client.suggested_params(),
         pk,
         randrange(10, 100) * 3000000,
     )
     stxn = txn.sign(private_key)
-    client.send_transaction((stxn))
-    time.sleep(SLEEP_TIME)
+    tx_id = stxn.transaction.get_txid()
+    client.send_transaction(stxn)
+    transaction.wait_for_confirmation(client, tx_id, 5)
     return sk, pk
 
+
+def create_debugger_context(
+    context_file="signed_txn.txn", output_file="dryrun_txn.msgp"
+):
+    sandbox_copyto = f"{SANDBOX_PATH} copyTo {context_file}"
+    dry_run_command = f"{SANDBOX_PATH} goal clerk dryrun -t {context_file} --dryrun-dump -o {output_file}"
+    sandbox_copyfrom = f"{SANDBOX_PATH} copyFrom {output_file}"
+    os.system(sandbox_copyto)
+    os.system(dry_run_command)
+    os.system(sandbox_copyfrom)
+
+
+# Create global account and clients
+client = create_algod_client()
+private_key, sender = get_funded_account()
+params = client.suggested_params()
 
 # Creates a stateful app for testing
 # The TEAL code for the app can be changed in sample-teal/
 def create_test_app():
+
     # Create transient
-    sk, pk = create_transient_account(sender, private_key)
+    sk, pk = create_transient_account(client, sender, private_key)
 
     # Declare application state storage (immutable)
     local_ints = 1
@@ -105,7 +114,7 @@ def create_test_app():
     # Compile the program with algod
     source_code = ""
     clear_code = ""
-    with open("some_logs.teal", mode="rb") as file:
+    with open("some_itxns.teal", mode="rb") as file:
         source_code = file.read()
     with open("clear.teal", mode="rb") as file:
         clear_code = file.read()
@@ -129,7 +138,7 @@ def create_test_app():
 
     # Write stxn to file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    transaction.write_to_file([signed_txn], dir_path + "/logs_signed.txn")
+    transaction.write_to_file([signed_txn], dir_path + "/signed_txn_create.txn")
 
     # Send transaction
     client.send_transactions([signed_txn])
@@ -169,7 +178,7 @@ def call_app(app_id):
 
     # Write stxn to file
     dir_path = os.path.dirname(os.path.realpath(__file__))
-    transaction.write_to_file(stxns, dir_path + "/logs_signed.txn")
+    transaction.write_to_file(stxns, dir_path + "/signed_txn.txn")
 
     # Send transaction
     client.send_transactions(stxns)
@@ -179,3 +188,4 @@ def call_app(app_id):
 
 app_id = create_test_app()
 call_app(app_id)
+create_debugger_context()
