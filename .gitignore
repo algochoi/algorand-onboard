@@ -1,2 +1,13 @@
 *.tok
 *.lsig
+
+# Environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+generated-data/

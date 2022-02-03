@@ -1,5 +1,6 @@
 import base64
 import os
+from pathlib import Path
 import pty
 from random import randrange
 import subprocess
@@ -9,8 +10,7 @@ from algosdk.future import transaction
 from algosdk.v2client import algod, indexer
 
 
-SANDBOX_PATH = ""  # Your sandbox path here
-
+sandbox_exec = Path(os.environ['SANDBOX_PATH']) / "sandbox"
 
 def create_algod_client():
     return algod.AlgodClient(
@@ -33,7 +33,7 @@ def compile_program(client, source_code):
 
 def get_sandbox_account():
     stdout = subprocess.run(
-        [SANDBOX_PATH, "goal", "account", "list"],
+        [sandbox_exec, "goal", "account", "list"],
         stdin=pty.openpty()[1],
         capture_output=True,
         text=True,
@@ -44,7 +44,7 @@ def get_sandbox_account():
 def export_sandbox_account():
     genesis_addr = get_sandbox_account()
     stdout = subprocess.run(
-        [SANDBOX_PATH, "goal", "account", "export", "-a", genesis_addr],
+        [sandbox_exec, "goal", "account", "export", "-a", genesis_addr],
         stdin=pty.openpty()[1],
         capture_output=True,
         text=True,
@@ -77,15 +77,19 @@ def create_transient_account(client, sender, private_key):
     return sk, pk
 
 
-def create_debugger_context(
-    context_file="signed_txn.txn", output_file="dryrun_txn.msgp"
-):
-    sandbox_copyto = f"{SANDBOX_PATH} copyTo {context_file}"
-    dry_run_command = f"{SANDBOX_PATH} goal clerk dryrun -t {context_file} --dryrun-dump -o {output_file}"
-    sandbox_copyfrom = f"{SANDBOX_PATH} copyFrom {output_file}"
+def create_debugger_context(output_path, context_file, output_file):
+    sandbox_copyto = f"{sandbox_exec} copyTo {context_file}"
+    dry_run_command = f"{sandbox_exec} goal clerk dryrun -t {context_file} --dryrun-dump -o {output_file}"
+    sandbox_copyfrom = f"{sandbox_exec} copyFrom {output_file}"
+
+    # Change CWD to structure copy commands in a sanbox container compliant manner.
+    cwd = os.getcwd()
+    os.chdir(output_path)
+
     os.system(sandbox_copyto)
     os.system(dry_run_command)
     os.system(sandbox_copyfrom)
+    os.chdir(cwd)
 
 
 # Create global account and clients
@@ -95,7 +99,7 @@ params = client.suggested_params()
 
 # Creates a stateful app for testing
 # The TEAL code for the app can be changed in sample-teal/
-def create_test_app():
+def create_test_app(output_path):
 
     # Create transient
     sk, pk = create_transient_account(client, sender, private_key)
@@ -137,8 +141,7 @@ def create_test_app():
     tx_id = signed_txn.transaction.get_txid()
 
     # Write stxn to file
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    transaction.write_to_file([signed_txn], dir_path + "/signed_txn_create.txn")
+    transaction.write_to_file([signed_txn], output_path / "signed_txn_create.txn")
 
     # Send transaction
     client.send_transactions([signed_txn])
@@ -152,7 +155,7 @@ def create_test_app():
     return app_id
 
 
-def call_app(app_id):
+def call_app(app_id, output_path):
     txn1 = transaction.PaymentTxn(
         sender,
         params,
@@ -177,15 +180,19 @@ def call_app(app_id):
     tx_id = stxns[0].get_txid()
 
     # Write stxn to file
-    dir_path = os.path.dirname(os.path.realpath(__file__))
-    transaction.write_to_file(stxns, dir_path + "/signed_txn.txn")
+    transaction.write_to_file(stxns, output_path / "signed_txn.txn")
 
     # Send transaction
     client.send_transactions(stxns)
     resp = transaction.wait_for_confirmation(client, tx_id, 5)
     print(f"Response: {resp}")
 
+output_path = Path(os.path.dirname(os.path.realpath(__file__))) / "generated-data"
+output_path.mkdir(exist_ok=True)
 
-app_id = create_test_app()
-call_app(app_id)
-create_debugger_context()
+app_id = create_test_app(output_path)
+call_app(app_id, output_path)
+create_debugger_context(
+    output_path=output_path,
+    context_file="signed_txn.txn",
+    output_file="dryrun_txn.msgp")
