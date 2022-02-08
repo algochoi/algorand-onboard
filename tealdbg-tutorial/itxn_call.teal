@@ -1,0 +1,21 @@
+#pragma version 6
+txn ApplicationID
+int 0
+==
+bnz oncreate
+itxn_begin
+    int appl
+    itxn_field TypeEnum
+    int 2
+    itxn_field ApplicationID
+    int 2
+    itxn_field Applications
+itxn_submit
+oncreate:
+txn ApplicationID
+itob
+log
+int 1000
+itob
+log
+int 1
