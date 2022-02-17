@@ -8,10 +8,19 @@ This document walks through some steps on using `tealdbg` using the Chrome Devel
 
 The included script, `tealdbg_deploy.py`, creates the app, then calls it in a group transaction where the first transaction is a payment to the app address and the second transaction is the app call. Then, it generates a debugger context using dryrun through `sandbox`. 
 
+To install the dependencies, run:
+```
+pip install -r requirements.txt
+```
+
 ## Debugging a TEAL app
 * Start `sandbox` if you haven't done so. Export `SANDBOX_PATH` pointing to your _sandbox_ directory, i.e. `export SANDBOX_PATH="your-path-to-sandbox-directory"`.
 * Run the script to deploy the example app. The script will automatically save a `signed_txn.txn` file and the debugging context `dryrun_txn.msgp` in the `generated-data/`.
 * Run `tealdbg`, e.g. from this directory, run: 
-```tealdbg debug some_itxns.teal -d generated/data/dryrun_txn.msgp --group-index 1 -v```
+
+```
+tealdbg debug some_itxns.teal -d generated/data/dryrun_txn.msgp --group-index 1 -v
+```
+
 * Open a Chrome based browser and go to: `chrome://inspect/#devices`. Press `Configure...` and add `127.0.0.1:9392`. This is the default port for tealdbg, but double check the tealdbg output to make sure this is the case.
 * Open the CDT session either through Chrome or copying the link that is outputted on the tealdbg (it should start with `devtools://devtools`).
