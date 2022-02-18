@@ -2,15 +2,17 @@ import base64
 import os
 from pathlib import Path
 import pty
-from random import randrange
+import random
 import subprocess
 
-from algosdk import account, mnemonic, logic
+from algosdk import account, encoding, mnemonic, logic
 from algosdk.future import transaction
 from algosdk.v2client import algod, indexer
 
 
-sandbox_exec = Path(os.environ['SANDBOX_PATH']) / "sandbox"
+sandbox_exec = Path(os.environ["SANDBOX_PATH"]) / "sandbox"
+output_path = Path(os.path.dirname(os.path.realpath(__file__))) / "generated-data"
+
 
 def create_algod_client():
     return algod.AlgodClient(
@@ -68,7 +70,7 @@ def create_transient_account(client, sender, private_key):
         sender,
         client.suggested_params(),
         pk,
-        randrange(10, 100) * 3000000,
+        random.randrange(10, 100) * 3000000,
     )
     stxn = txn.sign(private_key)
     tx_id = stxn.transaction.get_txid()
@@ -77,6 +79,7 @@ def create_transient_account(client, sender, private_key):
     return sk, pk
 
 
+# Uses sandbox to call goal clerk dryrun
 def create_debugger_context(output_path, context_file, output_file):
     sandbox_copyto = f"{sandbox_exec} copyTo {context_file}"
     dry_run_command = f"{sandbox_exec} goal clerk dryrun -t {context_file} --dryrun-dump -o {output_file}"
@@ -90,6 +93,17 @@ def create_debugger_context(output_path, context_file, output_file):
     os.system(dry_run_command)
     os.system(sandbox_copyfrom)
     os.chdir(cwd)
+
+
+# Uses the native Python SDK function to create dryrun dump
+def create_dryrun_dump(stxns, output_path, output_file):
+    if not isinstance(stxns, list):
+        stxns = [stxns]
+    drr = transaction.create_dryrun(client, stxns)
+
+    filename = output_path / output_file
+    with open(filename, "wb") as f:
+        f.write(base64.b64decode(encoding.msgpack_encode(drr)))
 
 
 # Create global account and clients
@@ -155,12 +169,12 @@ def create_test_app(output_path):
     return app_id
 
 
-def call_app(app_id, output_path):
+def call_app(app_id, output_path, output_file):
     txn1 = transaction.PaymentTxn(
         sender,
         params,
         logic.get_application_address(app_id),
-        randrange(10, 100) * 700000,
+        random.randrange(10, 100) * 700000,
     )
     txn2 = transaction.ApplicationNoOpTxn(
         sender=sender,
@@ -180,19 +194,34 @@ def call_app(app_id, output_path):
     tx_id = stxns[0].get_txid()
 
     # Write stxn to file
-    transaction.write_to_file(stxns, output_path / "signed_txn.txn")
+    transaction.write_to_file(stxns, output_path / output_file)
 
-    # Send transaction
-    client.send_transactions(stxns)
-    resp = transaction.wait_for_confirmation(client, tx_id, 5)
-    print(f"Response: {resp}")
+    # # Send transaction (optional for debugging)
+    # client.send_transactions(stxns)
+    # resp = transaction.wait_for_confirmation(client, tx_id, 5)
+    # print(f"Response: {resp}")
 
-output_path = Path(os.path.dirname(os.path.realpath(__file__))) / "generated-data"
+    return stxns
+
+
 output_path.mkdir(exist_ok=True)
 
 app_id = create_test_app(output_path)
-call_app(app_id, output_path)
-create_debugger_context(
+stxns = call_app(
+    app_id=app_id,
     output_path=output_path,
-    context_file="signed_txn.txn",
-    output_file="dryrun_txn.msgp")
+    output_file="signed_txn.txn",
+)
+# Use the Python SDK to create dryrun dump
+create_dryrun_dump(
+    stxns=stxns,
+    output_path=output_path,
+    output_file="dryrun_txn.msgp",
+)
+
+# Uses sandbox goal to create dryrun dump
+# create_debugger_context(
+#     output_path=output_path,
+#     context_file="signed_txn.txn",
+#     output_file="dryrun_txn.msgp",
+# )
