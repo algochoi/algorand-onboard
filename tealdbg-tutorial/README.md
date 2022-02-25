@@ -24,3 +24,8 @@ tealdbg debug some_itxns.teal -d generated/data/dryrun_txn.msgp --group-index 1 
 
 * Open a Chrome based browser and go to: `chrome://inspect/#devices`. Press `Configure...` and add `127.0.0.1:9392`. This is the default port for tealdbg, but double check the tealdbg output to make sure this is the case.
 * Open the CDT session either through Chrome or copying the link that is outputted on the tealdbg (it should start with `devtools://devtools`).
+
+### Debugging grouped transactions
+You can run a group of transaction by supplying the dryrun dump or a transaction group (encoded in `msgp`) with the balances file. e.g. `tealdbg debug -d dryrun_grp_.msgp` will allow you to debug each transaction in the group with a separate CDT tab. 
+
+Note that certain ops such as `gload` will only work when the entire group is supplied. Currently the `gaid` op is not supported by tealdbg. 
