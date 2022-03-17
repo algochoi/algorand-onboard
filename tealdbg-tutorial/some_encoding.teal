@@ -1,0 +1,32 @@
+#pragma version 6
+
+int 0x10
+int 16
+==
+pop
+
+int 0x10
+itob
+byte 0x16
+==
+pop
+
+addr QHNIS6EIKC3ADI2BSG4TH44IY4NTHW52TPECZOG3IEI2O4GVVLLYAEAKT4
+byte "81da89788850b601a34191b933f388c71b33dbba9bc82cb8db4111a770d5aad7"
+==
+pop
+
+byte b64 ERE=
+byte 0x1111
+==
+pop
+
+byte 0x1000
+log
+byte "1000"
+log
+int 1000
+itob
+log
+
+int 1

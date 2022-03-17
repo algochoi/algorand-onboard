@@ -1,0 +1,33 @@
+#pragma version 6
+
+txn ApplicationID
+bz handle_createapp
+
+int 99
+store 1
+
+itxn_begin
+    int acfg
+    itxn_field TypeEnum
+    int 1000000
+    itxn_field ConfigAssetTotal
+    int 3
+    itxn_field ConfigAssetDecimals
+    byte base64 AA== 
+    itxn_field ConfigAssetUnitName
+    byte base64(AAAAAAAAAAA=)
+    itxn_field ConfigAssetName
+    pushbytes 0x0000000000000000 
+    itxn_field ConfigAssetURL
+    global CurrentApplicationAddress
+    dup
+    dup2
+    itxn_field ConfigAssetManager
+    itxn_field ConfigAssetReserve
+    itxn_field ConfigAssetFreeze
+    itxn_field ConfigAssetClawback
+itxn_submit
+
+handle_createapp:
+int 1
+

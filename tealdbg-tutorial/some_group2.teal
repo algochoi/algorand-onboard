@@ -1,0 +1,11 @@
+#pragma version 6
+
+txn ApplicationID
+bz handle_createapp
+
+gload 2 1
+itob
+log
+
+handle_createapp:
+int 1
