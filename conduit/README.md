@@ -12,7 +12,7 @@ make
 ```
 Reference: https://github.com/algorand/conduit
 
-# Start up algod on testnet
+## Start up algod on testnet
 First make sure that the algod has `EnableFollowMode: true` in the `config.json`. This should pause catchup. Then start up algod by using some variant of `goal node start`.
 
 Follow mode should pause the node at a particular round. 
