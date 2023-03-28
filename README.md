@@ -64,6 +64,9 @@ On the TestNet, there is a bank that gives out free Algos: [Bank](https://bank.t
 [Sandbox](https://github.com/algorand/sandbox) can run a private dev network separate from `goal`. The main advantage of this is that you don't have to sync to an actual network (can take tens of minutes even with Fast Catchup) and you can confirm blocks instantaneously on dev mode (instead of waiting ~4.5s). You can checkout an example in this very repo by running the script in `sandbox-scripts/sandbox-test.py`.
 Sandbox commands are generally prefixed with `sandbox`, e.g. `sandbox goal account list`. 
 
+### Private networks
+Sandbox uses a private network by default. If you want to replicate this on a regular algod node, see [`private-net.md`](private-net.md).
+
 ## TEAL Contracts
 [Compiling contracts using goal clerk](https://medium.com/algorand/understanding-algorand-smart-contracts-b9fc743e7a0f)
 
@@ -132,6 +135,12 @@ The Cucumber tests can be seen in `features/unit` or `features/integration` in t
 Algod only keeps meaningful information about raw blocks (e.g. you query a block round and you get a JSON of all the information in that block). Algorand develops and maintains the [indexer](https://github.com/algorand/indexer) as a means of having a convenient way of making more meaningful queries on the blockchain state by maintaining its own Postgres database. It relies on an Algorand archival node (contains all the blocks in history) to validate transactions and imports them directly into its database. 
 
 The indexer can be thought of as two components: a REST API handler and a backend that reads and writes from the database (ignoring some details like importing blocks and executing them in the ledger). You can probably use sandbox to test some commands directly, user curl or use the SDKs to interact with the APIs. There is a tutorial [here](https://developer.algorand.org/docs/get-details/indexer/).
+
+## Conduit
+Conduit streams block data using various plugins and allow you to filter out particular information that may be relevant to you. 
+It can import blocks using algod (follower or archival mode), and export blocks into indexer.
+
+See [conduit](conduit/README.md) for more details.
 
 ## Teal Debugger (tealdbg)
 `tealdbg` is a browser-based debugger that comes with `go-algorand`. There is a tutorial on how to use it in [`tealdbg-tutorial`](tealdbg-tutorial/README.md)
