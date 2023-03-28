@@ -17,6 +17,8 @@ A collection of notes and potentially useful stuff as I onboard.
     + [go-algorand](#go-algorand)
     + [SDKs](#sdks)
   * [Indexer](#indexer)
+  * [Conduit](#conduit)
+  * [Tealdbg](#teal-debugger-tealdbg)
 
 ## Basics
 ### Installing a node
